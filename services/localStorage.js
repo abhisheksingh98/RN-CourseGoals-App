@@ -1,8 +1,7 @@
-import * as Realm from 'realm';
+import Realm from 'realm';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 let realmInstance = null;
-let failedRequests = [];
 
 const TodoSchema = {
   name: 'Todo',
@@ -11,28 +10,32 @@ const TodoSchema = {
     text: 'string',
     completed: { type: 'bool', default: false },
     createdAt: 'date',
-    updatedAt: 'date',
   },
+  primaryKey: 'id',
 };
 
 export const initializeRealm = async () => {
   try {
-    realmInstance = await Realm.open({ schema: [TodoSchema] });
+    realmInstance = await Realm.open({
+      schema: [TodoSchema],
+      schemaVersion: 1,
+    });
   } catch (e) {
-    console.log('Realm init failed');
+    console.error('Realm init failed:', e);
   }
 };
 
 export const saveTodosLocally = async (todos) => {
   try {
     await AsyncStorage.setItem('todos', JSON.stringify(todos));
-    
+
     if (realmInstance) {
       realmInstance.write(() => {
-        const allTodos = realmInstance.objects('Todo');
-        realmInstance.delete(allTodos); // Correctly delete all objects
         todos.forEach(todo => {
-          realmInstance.create('Todo', todo);
+          realmInstance.create('Todo', {
+            ...todo,
+            createdAt: new Date(todo.createdAt)
+          }, Realm.UpdateMode.All);
         });
       });
     }
@@ -47,12 +50,12 @@ export const loadTodosLocally = async () => {
     if (stored) {
       return JSON.parse(stored);
     }
-    
+
     if (realmInstance) {
       const todos = realmInstance.objects('Todo');
       return Array.from(todos);
     }
-    
+
     return [];
   } catch (error) {
     console.log('Error loading todos locally', error);
@@ -63,11 +66,10 @@ export const loadTodosLocally = async () => {
 export const clearAll = async () => {
   try {
     await AsyncStorage.removeItem('todos');
-    
+
     if (realmInstance) {
       realmInstance.write(() => {
-        const allTodos = realmInstance.objects('Todo');
-        realmInstance.delete(allTodos);
+        realmInstance.deleteAll();
       });
     }
   } catch (error) {
@@ -105,3 +107,4 @@ export default {
   exportData,
   importData,
 };
+

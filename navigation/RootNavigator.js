@@ -1,133 +1,133 @@
 import React from 'react';
-import { createDrawerNavigator, createStackNavigator, createBottomTabNavigator, createAppContainer } from 'react-navigation';
-import { Icon } from 'native-base';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+
 import TodoListScreen from '../screens/TodoListScreen';
 import TodoDetailScreen from '../screens/TodoDetailScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import AnalyticsScreen from '../screens/AnalyticsScreen';
 
-const TodoStack = createStackNavigator(
-  {
-    TodoList: {
-      screen: TodoListScreen,
-      navigationOptions: {
-        headerTitle: 'Goals',
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+const Drawer = createDrawerNavigator();
+
+function TodoStack() {
+  return (
+    <Stack.Navigator
+      initialRouteName="TodoList"
+      screenOptions={{
         headerStyle: { backgroundColor: '#007AFF' },
         headerTintColor: '#fff',
-      },
-    },
-    TodoDetail: {
-      screen: TodoDetailScreen,
-      navigationOptions: {
-        headerTitle: 'Goal Details',
+        headerTitleStyle: { fontWeight: 'bold' },
+      }}
+    >
+      <Stack.Screen
+        name="TodoList"
+        component={TodoListScreen}
+        options={{ title: 'Goals' }}
+      />
+      <Stack.Screen
+        name="TodoDetail"
+        component={TodoDetailScreen}
+        options={{ title: 'Goal Details' }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+function SettingsStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
         headerStyle: { backgroundColor: '#007AFF' },
         headerTintColor: '#fff',
-      },
-    },
-  },
-  {
-    initialRouteName: 'TodoList',
-  }
-);
+      }}
+    >
+      <Stack.Screen name="Settings" component={SettingsScreen} />
+    </Stack.Navigator>
+  );
+}
 
-const SettingsStack = createStackNavigator(
-  {
-    Settings: {
-      screen: SettingsScreen,
-      navigationOptions: {
-        headerTitle: 'Settings',
+function ProfileStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
         headerStyle: { backgroundColor: '#007AFF' },
         headerTintColor: '#fff',
-      },
-    },
-  },
-  {
-    initialRouteName: 'Settings',
-  }
-);
+      }}
+    >
+      <Stack.Screen name="Profile" component={ProfileScreen} />
+    </Stack.Navigator>
+  );
+}
 
-const ProfileStack = createStackNavigator(
-  {
-    Profile: {
-      screen: ProfileScreen,
-      navigationOptions: {
-        headerTitle: 'Profile',
+function AnalyticsStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{
         headerStyle: { backgroundColor: '#007AFF' },
         headerTintColor: '#fff',
-      },
-    },
-  }
-);
+      }}
+    >
+      <Stack.Screen name="Analytics" component={AnalyticsScreen} />
+    </Stack.Navigator>
+  );
+}
 
-const AnalyticsStack = createStackNavigator(
-  {
-    Analytics: {
-      screen: AnalyticsScreen,
-      navigationOptions: {
-        headerTitle: 'Analytics',
-        headerStyle: { backgroundColor: '#007AFF' },
-        headerTintColor: '#fff',
-      },
-    },
-  }
-);
+function TabNavigator() {
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        tabBarActiveTintColor: '#007AFF',
+        tabBarInactiveTintColor: '#666',
+        headerShown: false,
+      }}
+    >
+      <Tab.Screen
+        name="HomeTab"
+        component={TodoStack}
+        options={{ tabBarLabel: 'Home' }}
+      />
+      <Tab.Screen
+        name="AnalyticsTab"
+        component={AnalyticsStack}
+        options={{ tabBarLabel: 'Analytics' }}
+      />
+      <Tab.Screen
+        name="SettingsTab"
+        component={SettingsStack}
+        options={{ tabBarLabel: 'Settings' }}
+      />
+      <Tab.Screen
+        name="ProfileTab"
+        component={ProfileStack}
+        options={{ tabBarLabel: 'Profile' }}
+      />
+    </Tab.Navigator>
+  );
+}
 
-const TabNavigator = createBottomTabNavigator(
-  {
-    Home: {
-      screen: TodoStack,
-      navigationOptions: {
-        tabBarLabel: 'Home',
-      },
-    },
-    Analytics: {
-      screen: AnalyticsStack,
-      navigationOptions: {
-        tabBarLabel: 'Analytics',
-      },
-    },
-    Settings: {
-      screen: SettingsStack,
-      navigationOptions: {
-        tabBarLabel: 'Settings',
-      },
-    },
-    Profile: {
-      screen: ProfileStack,
-      navigationOptions: {
-        tabBarLabel: 'Profile',
-      },
-    },
-  },
-  {
-    initialRouteName: 'Home',
-    tabBarOptions: {
-      activeTintColor: '#007AFF',
-      inactiveTintColor: '#666',
-      style: {
-        backgroundColor: '#f5f5f5',
-        borderTopColor: '#ddd',
-      },
-    },
-  }
-);
+export default function RootNavigator() {
+  return (
+    <Drawer.Navigator
+      initialRouteName="Main"
+      screenOptions={{
+        drawerActiveTintColor: '#007AFF',
+      }}
+    >
+      <Drawer.Screen
+        name="Main"
+        component={TabNavigator}
+        options={{ title: 'Home', headerShown: false }}
+      />
+      <Drawer.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{ title: 'Settings' }}
+      />
+    </Drawer.Navigator>
+  );
+}
 
-const DrawerNavigator = createDrawerNavigator(
-  {
-    Main: {
-      screen: TabNavigator,
-    },
-    Settings: {
-      screen: SettingsScreen,
-    },
-  },
-  {
-    initialRouteName: 'Main',
-    contentOptions: {
-      activeTintColor: '#007AFF',
-    },
-  }
-);
-
-export default Navigation = createAppContainer(DrawerNavigator);
